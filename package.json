@@ -1,0 +1,21 @@
+{
+	"name": "i18n-static",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "vite",
+    "build": "vite build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"vue": "2.6.12"
+	},
+	"devDependencies": {
+		"vite": "^4.4.5",
+		"vite-plugin-vue2": "^2.0.3",
+		"vue-template-compiler": "2.6.12"
+	}
+}
