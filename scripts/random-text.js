@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
-const LENGTH = 5000
+const LENGTH = 3000
 
 // 定义一些常用的词语库
 const subjects = ['科技', '文化', '教育', '环保', '健康', '旅游', '美食', '艺术', '体育', '经济'];
@@ -21,15 +21,14 @@ function generateSentence() {
 	const useAdj = Math.random() < 0.7;
 	const usePhrase = Math.random() < 0.5;
 
-	let sentence = `${subject}${useAdj ? adj : ''} ${verb} ${obj}`;
+	let sentence = `${subject}${useAdj ? adj : ''},${verb},${obj}`;
 	if (usePhrase) {
-		sentence += ` 在${phrase}领域`;
+		sentence += `,在${phrase}领域`;
 	}
 
 	return sentence;
 }
 
-let seed = 0;
 function generateKey(str) {
     const hash = crypto.createHash('md5')
     hash.update(str)
@@ -50,28 +49,24 @@ for (let set of sets) {
 
 
 function writeTemplte() {
-    const data = [...sets].map(s => `<div>${s}</div>`).join('\n')
-    fs.writeFileSync(path.resolve(__dirname, '../template'), data, 'utf-8')
+    const data = `<template>\n<div>\n${[...sets].map(s => `<div>${s}</div>`).join('\n')}\n</div>\n</template>\n`
+    fs.writeFileSync(path.resolve(__dirname, './template'), data, 'utf-8')
 }
 function writeI18nTemplate() {
-    const data = keys.map(k => `<div>{{ $t('@xiaoe/pkg.a.${k}') }}</div>`).join('\n')
-    fs.writeFileSync(path.resolve(__dirname, '../i18n-template'), data, 'utf-8')
+    const data = `<template>\n<div>\n${keys.map(k => `<div>{{ $t('${k}') }}</div>`).join('\n')}\n</div>\n</template>\n`
+    fs.writeFileSync(path.resolve(__dirname, './i18n-template'), data, 'utf-8')
 }
 
 function writePkg() {
     const str = [...sets]
-    const obj = {
-        '@xiaoe/pkg': {
-            'a': {}
-        }
-    }
-    const storage = obj['@xiaoe/pkg']['a']
+    const obj = {}
+    const storage = obj
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i]
         storage[key] = str[i]
     }
     const data = JSON.stringify(obj)
-    fs.writeFileSync(path.resolve(__dirname, '../pkg.json'), data, 'utf-8')
+    fs.writeFileSync(path.resolve(__dirname, './pkg.json'), data, 'utf-8')
 }
 
 writeTemplte()

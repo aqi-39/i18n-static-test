@@ -6,7 +6,7 @@ export default defineConfig({
 	plugins: [vue2()],
 	base: './',
 	build: {
-		outDir: 'dist/5000',
+		outDir: 'dist/3000',
 		assetsDir: ''
 	},
 	resolve: {
