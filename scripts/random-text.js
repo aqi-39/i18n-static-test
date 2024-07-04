@@ -1,4 +1,7 @@
-const LENGTH = 1000
+const fs = require('fs')
+const path = require('path')
+const crypto = require('crypto')
+const LENGTH = 5000
 
 // 定义一些常用的词语库
 const subjects = ['科技', '文化', '教育', '环保', '健康', '旅游', '美食', '艺术', '体育', '经济'];
@@ -6,9 +9,6 @@ const verbs = ['推动', '促进', '影响', '改变', '提高', '探索', '享�
 const objects = ['发展', '生活', '环境', '知识', '技术', '品味', '美', '身体', '世界', '市场'];
 const adjectives = ['快速', '深入', '广泛', '积极', '显著', '独特', '全面', '重要', '必要', '巨大'];
 const phrases = ['中', '全球', '未来', '当代', '日常', '人类', '社会', '自然', '数字', '历史'];
-
-
-const symbols = ['a', 'b', 'c', 'd', 'e', 'f']
 
 function generateSentence() {
 	const subject = subjects[Math.floor(Math.random() * subjects.length)];
@@ -29,9 +29,11 @@ function generateSentence() {
 	return sentence;
 }
 
-function generateKey() {
-    const useSymbol = symbols.slice(0, Math.floor(Math.random() * (symbols.length + 1)))
-    return useSymbol.join('.')
+let seed = 0;
+function generateKey(str) {
+    const hash = crypto.createHash('md5')
+    hash.update(str)
+    return `${str.slice(0, 12)}_${hash.digest('hex').slice(0,6)}`
 }
 
 // 生成并打印1000条句子
@@ -41,42 +43,32 @@ let keys = []
 while (sets.size < LENGTH) {
     sets.add(generateSentence())
 }
-
-while(keys.length < LENGTH) {
-    const key = generateKey()
-    keys.push(key)
+for (let set of sets) {
+    keys.push(generateKey(set))
 }
 
-const fs = require('fs')
-const path = require('path')
+
 
 function writeTemplte() {
     const data = [...sets].map(s => `<div>${s}</div>`).join('\n')
     fs.writeFileSync(path.resolve(__dirname, '../template'), data, 'utf-8')
 }
-
 function writeI18nTemplate() {
-    let cnt = 0;
-    const data = keys.map(k => `<div>{{ $t('${k ? `${k}.${cnt++}` : cnt++ }') }}</div>`).join('\n')
+    const data = keys.map(k => `<div>{{ $t('@xiaoe/pkg.a.${k}') }}</div>`).join('\n')
     fs.writeFileSync(path.resolve(__dirname, '../i18n-template'), data, 'utf-8')
 }
 
 function writePkg() {
     const str = [...sets]
-    let cnt = 0;
-    const obj = {}
+    const obj = {
+        '@xiaoe/pkg': {
+            'a': {}
+        }
+    }
+    const storage = obj['@xiaoe/pkg']['a']
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i]
-        p = key.split('.')
-        let storage = obj
-        for (let symbol of p) {
-            if (!symbol) break;
-            if (!storage[symbol]) {
-                storage[symbol] = {}
-            }
-            storage = storage[symbol]
-        }
-        storage[cnt++] = str[i]
+        storage[key] = str[i]
     }
     const data = JSON.stringify(obj)
     fs.writeFileSync(path.resolve(__dirname, '../pkg.json'), data, 'utf-8')
