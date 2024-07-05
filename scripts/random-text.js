@@ -1,7 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
-const LENGTH = 3000
+const LENGTH = 5000
+const KEY_CHA_LENG = 6
+const KEY_HASH_LENG = 6
 
 // 定义一些常用的词语库
 const subjects = ['科技', '文化', '教育', '环保', '健康', '旅游', '美食', '艺术', '体育', '经济'];
@@ -32,7 +34,7 @@ function generateSentence() {
 function generateKey(str) {
     const hash = crypto.createHash('md5')
     hash.update(str)
-    return `${str.slice(0, 12)}_${hash.digest('hex').slice(0,6)}`
+    return `${str.slice(0, KEY_CHA_LENG)}_${hash.digest('hex').slice(0, KEY_HASH_LENG)}`
 }
 
 // 生成并打印1000条句子
